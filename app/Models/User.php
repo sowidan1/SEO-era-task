@@ -16,6 +16,7 @@ class User extends Authenticatable implements JWTSubject
         'phone',
         'email',
         'password',
+        'name',
     ];
 
     protected $hidden = [
@@ -44,5 +45,10 @@ class User extends Authenticatable implements JWTSubject
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->name;
     }
 }
