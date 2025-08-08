@@ -2,11 +2,13 @@
 
 function apiError(
     $error,
-    $code,
+    $code = 400,
+    $errors = []
 ) {
     $response = [
         'success' => false,
         'error' => $error,
+        'errors' => $errors
     ];
 
     return response()->json($response, $code);

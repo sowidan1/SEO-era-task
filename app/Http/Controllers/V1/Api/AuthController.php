@@ -3,57 +3,72 @@
 namespace App\Http\Controllers\V1\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\Api\Auth\LoginRequest;
+use App\Http\Requests\V1\Api\Auth\RegisterRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = User::create($request->validated());
 
         try {
             $token = JWTAuth::fromUser($user);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            return apiError(
+                error: 'Could not create token',
+                code: 500,
+                errors: [
+                    'error' => $e->getMessage(),
+                ]
+            );
         }
 
-        return response()->json([
-            'token' => $token,
-            'user' => $user,
-        ], 201);
+        return apiSuccess(
+            data: [
+                'token' => $token,
+                'user' => $user,
+            ],
+            message: 'Successfully registered',
+            code: 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('phone', 'password');
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return apiError(
+                    error: 'Invalid credentials',
+                    code: 401,
+                    errors: [
+                        'error' => 'Invalid credentials',
+                    ]
+                );
             }
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            return apiError(
+                error: 'Could not create token',
+                code: 500,
+                errors: [
+                    'error' => $e->getMessage(),
+                ]
+            );
         }
 
-        return response()->json([
-            'token' => $token,
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
-        ]);
+        return apiSuccess(
+            data: [
+                'token' => $token,
+                'expires_in' => auth('api')->factory()->getTTL() * 60,
+            ],
+            message: 'Successfully logged in',
+            code: 200
+        );
     }
 
     public function logout()
@@ -61,10 +76,20 @@ class AuthController extends Controller
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Failed to logout, please try again'], 500);
+            return apiError(
+                error: 'Failed to logout',
+                code: 500,
+                errors: [
+                    'error' => $e->getMessage(),
+                ]
+            );
         }
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return apiSuccess(
+            data: [],
+            message: 'Successfully logged out',
+            code: 200
+        );
     }
 
     public function getUser()
@@ -72,24 +97,28 @@ class AuthController extends Controller
         try {
             $user = Auth::user();
             if (! $user) {
-                return response()->json(['error' => 'User not found'], 404);
+                return apiError(
+                    error: 'User not found',
+                    code: 404,
+                    errors: [
+                        'error' => 'User not found',
+                    ]
+                );
             }
 
-            return response()->json($user);
+            return apiSuccess(
+                data: $user,
+                message: 'Successfully fetched user profile',
+                code: 200
+            );
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Failed to fetch user profile'], 500);
-        }
-    }
-
-    public function updateUser(Request $request)
-    {
-        try {
-            $user = Auth::user();
-            $user->update($request->only(['name', 'email']));
-
-            return response()->json($user);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Failed to update user'], 500);
+            return apiError(
+                error: 'Failed to fetch user',
+                code: 500,
+                errors: [
+                    'error' => $e->getMessage(),
+                ]
+            );
         }
     }
 }
