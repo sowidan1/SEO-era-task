@@ -8,7 +8,7 @@ function apiError(
     $response = [
         'success' => false,
         'error' => $error,
-        'errors' => $errors
+        'errors' => $errors,
     ];
 
     return response()->json($response, $code);

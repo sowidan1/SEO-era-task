@@ -42,7 +42,7 @@ class AuthController extends Controller
         $credentials = $request->only('phone', 'password');
 
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
+            if (! $token = JWTAuth::attempt($credentials)) {
                 return apiError(
                     error: 'Invalid credentials',
                     code: 401,
