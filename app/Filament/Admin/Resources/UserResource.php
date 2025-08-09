@@ -2,8 +2,6 @@
 
 namespace App\Filament\Admin\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -34,10 +32,10 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required(fn($record) => $record === null)
+                    ->required(fn ($record) => $record === null)
                     ->maxLength(255)
-                    ->dehydrateStateUsing(fn($state) => filled($state) ? bcrypt($state) : null)
-                    ->dehydrated(fn($state) => filled($state)),
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
+                    ->dehydrated(fn ($state) => filled($state)),
             ]);
     }
 
