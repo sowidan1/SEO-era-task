@@ -1,61 +1,162 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SEO ERA Task
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust, feature-rich Laravel-based RESTful API for comprehensive authentication and post management, integrated with a Filament admin panel for seamless dashboard functionality.
 
-## About Laravel
+## Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Admin Panel](#admin-panel)
+- [Bonus Features](#bonus-features)
+- [Output](#output)
+- [Contributing](#contributing)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Core Functionality
+- **User Authentication**: Register and login using email, username, password, and Egyptian mobile number, secured with JWT (JSON Web Tokens).
+- **Post Management**: Authenticated users can create posts with a required title, description (limited to 2 KB), and contact phone number (validated as an Egyptian mobile number).
+- **Post Listing**: Users can view a paginated list of posts created by other users, displaying title and description (truncated to 512 characters), sorted by most recent first.
+- **Admin Panel**: A Filament-based control panel for CRUD operations on users and posts.
+- **Database Management**: Uses Laravel migrations and seeders for database setup and initial data population.
+- **ORM Relationships**: Leverages Laravel Eloquent ORM for relationships between users and posts.
+- **Logging**: Integrates Laravel Telescope for logging all actions and errors.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Bonus Features
+- **SOLID Principles and Design Patterns**: Implements separation of concerns using service classes (`AuthService`, `PostService`) and dependency injection, adhering to SOLID principles.
+- **Mobile Number Login**: Supports login via Egyptian mobile number and password.
+- **Daily Reports**: Generates a daily report at midnight for new posts and users, sent via email to the admin.
 
-## Learning Laravel
+## Requirements
+- **PHP**: 8.1 or higher
+- **Composer**: 2.0 or higher
+- **MySQL**: 8.0 or higher
+- **Laravel**: 12.x
+- **Node.js**: For Filament admin panel assets
+- **Mail Server**: SMTP server for sending daily reports
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/sowidan1/SEO-era-task.git
+cd SEO-era-task
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Install Dependencies
+Install PHP dependencies via Composer:
+```bash
+composer install
+```
+Install Node.js dependencies for Filament:
+```bash
+npm install && npm run build
+```
 
-## Laravel Sponsors
+### 3. Environment Setup
+Copy the example environment file and generate an application key:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. Database Migration
+Run migrations to set up the database schema:
+```bash
+php artisan migrate
+```
+Optionally, seed the database with initial data:
+```bash
+php artisan db:seed
+```
 
-### Premium Partners
+### 5. Install Laravel Telescope
+Laravel Telescope is pre-installed for logging actions and errors.
+```bash
+artisan make:filament-user
+```
+### Access it at:
+```
+http://your-domain/telescope
+```
+Ensure Telescope is configured in the `.env` file:
+```env
+TELESCOPE_ENABLED=true
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Configuration
+
+### Environment Variables
+Edit the `.env` file with the following settings:
+
+#### Database Configuration
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=seo_era_task
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+#### JWT Configuration
+```env
+JWT_SECRET=your_jwt_secret
+```
+Generate the JWT secret:
+```bash
+php artisan jwt:secret
+```
+
+#### Queue Configuration
+For processing daily reports:
+```env
+QUEUE_CONNECTION=database
+```
+
+#### Mail Configuration
+For sending daily reports to the admin:
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=your_smtp_host
+MAIL_PORT=587
+MAIL_USERNAME=your_email@domain.com
+MAIL_PASSWORD=your_app_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your_email@domain.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+### Background Tasks
+Start the queue worker to process daily reports:
+```bash
+php artisan queue:work
+```
+
+## Admin Panel
+The admin panel is built using **Filament**, providing a user-friendly interface for managing users and posts:
+- **Access**: `http://your-domain/admin`
+- **Features**:
+  - CRUD operations for users (create, read, update, delete).
+  - CRUD operations for posts, including viewing and editing title, description, and contact phone.
+- **Authentication**
+```bash
+    artisan make:filament-user
+```
+
+## Bonus Features
+- **SOLID Principles**: Uses service classes (`AuthService`, `PostService`) and dependency injection for clean, maintainable code.
+- **Mobile Number Login**: Supports login with Egyptian mobile numbers.
+- **Daily Reports**: A scheduled command generates a daily report of new users and posts, emailed to the admin at midnight.
+
+## Output
+1. **Code Repository**: The code is hosted on GitHub: [https://github.com/sowidan1/SEO-era-task](https://github.com/sowidan1/SEO-era-task).
+2. **Postman Collection**: Included in the repository as `postman_collection.json`.
+3. **Database Dump**: A full database dump (`seo_era_task.sql`) is included in the repository for reference.
+4. **README**: This file provides detailed setup and deployment instructions.
 
 ## Contributing
+Developed with ❤️ by [Osama Sowidan](https://github.com/sowidan1) - Software Engineer.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+For contributions, please fork the repository, create a feature branch, and submit a pull request. Ensure all tests pass and follow the coding standards.
