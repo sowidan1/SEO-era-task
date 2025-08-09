@@ -1,0 +1,230 @@
+{
+	"info": {
+		"_postman_id": "947d2336-36c1-41e3-851a-7c5907ff56aa",
+		"name": "SEO",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27167134"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "sowida33",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "01014448899",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "ma33d@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "omfs12875;",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/v1/register",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"v1",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "phone",
+									"value": "01014448899",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "omfs12875;",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/v1/login",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/v1/logout",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"v1",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "index",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{local}}/v1/posts",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "store",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "hi first tit",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "hi first deschi first deschi first deschi first deschi first desc",
+									"type": "text"
+								},
+								{
+									"key": "contact_phone",
+									"value": "01014447788",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{local}}/v1/posts",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
