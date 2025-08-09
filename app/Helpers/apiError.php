@@ -1,13 +1,13 @@
 <?php
 
 function apiError(
-    $error,
+    $message,
     $code = 400,
     $errors = []
 ) {
     $response = [
         'success' => false,
-        'error' => $error,
+        'message' => $message,
         'errors' => $errors,
     ];
 

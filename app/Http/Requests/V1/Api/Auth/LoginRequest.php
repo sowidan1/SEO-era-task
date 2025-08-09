@@ -11,7 +11,11 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => 'required|string',
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^(\+201|01)[0-2,5]{1}[0-9]{8}$/',
+            ],
             'password' => 'required|string',
         ];
     }
@@ -19,7 +23,7 @@ class LoginRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(apiError(
-            error: 'Validation failed',
+            message: 'Validation failed',
             code: 422,
             errors: $validator->errors()
         ));

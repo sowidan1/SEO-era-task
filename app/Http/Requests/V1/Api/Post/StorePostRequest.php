@@ -19,10 +19,10 @@ class StorePostRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(response()->json([
-            'success' => false,
-            'message' => 'Validation failed',
-            'errors' => $validator->errors(),
-        ], 422));
+        throw new HttpResponseException(apiError(
+            message: 'Validation failed',
+            code: 422,
+            errors: $validator->errors()
+        ));
     }
 }

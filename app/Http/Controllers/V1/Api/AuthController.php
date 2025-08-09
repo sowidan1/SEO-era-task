@@ -5,82 +5,73 @@ namespace App\Http\Controllers\V1\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Api\Auth\LoginRequest;
 use App\Http\Requests\V1\Api\Auth\RegisterRequest;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Services\Services\AuthService;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function register(RegisterRequest $request)
     {
-        $user = User::create($request->validated());
+        $result = $this->authService->register($request->validated());
 
-        try {
-            $token = JWTAuth::fromUser($user);
-        } catch (JWTException $e) {
+        if ($result === false) {
             return apiError(
-                error: 'Could not create token',
-                code: 500,
+                message: 'Failed to register',
+                code: Response::HTTP_UNAUTHORIZED,
                 errors: [
-                    'error' => $e->getMessage(),
+                    'error' => 'Invalid credentials',
                 ]
             );
         }
 
         return apiSuccess(
-            data: [
-                'token' => $token,
-                'user' => $user,
-            ],
+            data: $result,
             message: 'Successfully registered',
-            code: 201);
+            code: Response::HTTP_CREATED
+        );
     }
 
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('phone', 'password');
+        $result = $this->authService->login($request->validated());
 
-        try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return apiError(
-                    error: 'Invalid credentials',
-                    code: 401,
-                    errors: [
-                        'error' => 'Invalid credentials',
-                    ]
-                );
-            }
-        } catch (JWTException $e) {
+        if ($result === false) {
             return apiError(
-                error: 'Could not create token',
-                code: 500,
+                message: 'Failed to login',
+                code: Response::HTTP_UNAUTHORIZED,
                 errors: [
-                    'error' => $e->getMessage(),
+                    'error' => 'Invalid credentials',
                 ]
             );
         }
 
         return apiSuccess(
             data: [
-                'token' => $token,
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
+                'token' => $result,
+                'expires_in' => auth('api')->factory()->getTTL() * 60, // Convert minutes to seconds
             ],
             message: 'Successfully logged in',
-            code: 200
+            code: Response::HTTP_OK
         );
     }
 
     public function logout()
     {
-        try {
-            JWTAuth::invalidate(JWTAuth::getToken());
-        } catch (JWTException $e) {
+        $result = $this->authService->logout();
+
+        if ($result === false) {
             return apiError(
-                error: 'Failed to logout',
-                code: 500,
+                message: 'Failed to logout',
+                code: Response::HTTP_INTERNAL_SERVER_ERROR,
                 errors: [
-                    'error' => $e->getMessage(),
+                    'error' => 'Something went wrong',
                 ]
             );
         }
@@ -88,37 +79,7 @@ class AuthController extends Controller
         return apiSuccess(
             data: [],
             message: 'Successfully logged out',
-            code: 200
+            code: Response::HTTP_OK
         );
-    }
-
-    public function getUser()
-    {
-        try {
-            $user = Auth::user();
-            if (! $user) {
-                return apiError(
-                    error: 'User not found',
-                    code: 404,
-                    errors: [
-                        'error' => 'User not found',
-                    ]
-                );
-            }
-
-            return apiSuccess(
-                data: $user,
-                message: 'Successfully fetched user profile',
-                code: 200
-            );
-        } catch (JWTException $e) {
-            return apiError(
-                error: 'Failed to fetch user',
-                code: 500,
-                errors: [
-                    'error' => $e->getMessage(),
-                ]
-            );
-        }
     }
 }
