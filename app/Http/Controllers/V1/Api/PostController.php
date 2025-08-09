@@ -4,52 +4,37 @@ namespace App\Http\Controllers\V1\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Api\Post\StorePostRequest;
-use App\Http\Resources\V1\PostResource;
-use App\Models\Post;
+use App\Services\Services\PostService;
+use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
 {
+    protected $postService;
+
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index()
     {
-        $query = Post::with('user:id,username')
-            ->orderByDesc('created_at');
-
-        if (auth()->check()) {
-            $query->where('user_id', '!=', auth()->id());
-        }
-
-        $posts = $query->paginate(10);
+        $posts = $this->postService->index();
 
         return apiSuccess(
-            data: [
-                'posts' => PostResource::collection($posts),
-                'meta' => [
-                    'current_page' => $posts->currentPage(),
-                    'last_page' => $posts->lastPage(),
-                    'per_page' => $posts->perPage(),
-                    'total' => $posts->total(),
-                    'next_page_url' => $posts->nextPageUrl(),
-                ],
-            ],
+            data: $posts,
             message: 'Successfully fetched posts',
-            code: 200
+            code: Response::HTTP_OK
         );
     }
 
     public function store(StorePostRequest $request)
     {
-        $post = Post::create([
-            'title' => $request->validated('title'),
-            'description' => $request->validated('description'),
-            'contact_phone' => $request->validated('contact_phone'),
-            'user_id' => auth()->user()->id,
-        ]);
+        $post = $this->postService->store($request->validated());
 
         return apiSuccess(
-            data: [
-                'post' => PostResource::make($post),
-            ],
+            data: $post,
             message: 'Successfully created post',
-            code: 201);
+            code: Response::HTTP_CREATED
+        );
     }
 }
